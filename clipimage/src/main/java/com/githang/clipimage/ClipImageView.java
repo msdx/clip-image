@@ -1,9 +1,13 @@
 package com.githang.clipimage;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
@@ -24,6 +28,12 @@ import android.widget.ImageView;
  */
 public class ClipImageView extends ImageView implements
         ScaleGestureDetector.OnScaleGestureListener, View.OnTouchListener {
+    private final int mMaskColor;
+
+    private final Paint mPaint;
+    private final int mWidth;
+    private final int mHeight;
+    private final String mTipText;
 
     private float mScaleMax = 4.0f;
     private float mScaleMin = 2.0f;
@@ -90,6 +100,20 @@ public class ClipImageView extends ImageView implements
                 });
         mScaleGestureDetector = new ScaleGestureDetector(context, this);
         this.setOnTouchListener(this);
+
+        mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPaint.setColor(Color.WHITE);
+
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.ClipImageView);
+        mWidth = ta.getInteger(R.styleable.ClipImageView_civWidth, 1);
+        mHeight = ta.getInteger(R.styleable.ClipImageView_civHeight, 1);
+        mTipText = ta.getString(R.styleable.ClipImageView_civTipText);
+        mMaskColor = ta.getColor(R.styleable.ClipImageView_civMaskColor, 0xB2000000);
+        final int textSize = ta.getDimensionPixelSize(R.styleable.ClipImageView_civTipTextSize, 24);
+        mPaint.setTextSize(textSize);
+        ta.recycle();
+
+        mPaint.setDither(true);
     }
 
     /**
@@ -284,6 +308,17 @@ public class ClipImageView extends ImageView implements
     }
 
     @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        final int width = getWidth();
+        final int height = getHeight();
+        final int borderHeight = width * mHeight / mWidth;
+        mClipBorder.right = width;
+        mClipBorder.top = (height - borderHeight) / 2;
+        mClipBorder.bottom = mClipBorder.top + borderHeight;
+    }
+
+    @Override
     public void setImageDrawable(Drawable drawable) {
         super.setImageDrawable(drawable);
         resetImageMatrix();
@@ -424,8 +459,8 @@ public class ClipImageView extends ImageView implements
         return Math.sqrt((dx * dx) + (dy * dy)) >= mTouchSlop;
     }
 
-    public void setClipBorder(Rect clipBorder) {
-        mClipBorder = clipBorder;
+    public Rect getClipBorder() {
+        return mClipBorder;
     }
 
     public void setMaxOutputWidth(int maxOutputWidth) {
@@ -436,5 +471,32 @@ public class ClipImageView extends ImageView implements
         final float[] matrixValues = new float[9];
         mScaleMatrix.getValues(matrixValues);
         return matrixValues;
+    }
+
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        final int width = getWidth();
+        final int height = getHeight();
+
+        mPaint.setColor(mMaskColor);
+        mPaint.setStyle(Paint.Style.FILL);
+        canvas.drawRect(0, 0, width, mClipBorder.top, mPaint);
+        canvas.drawRect(0, mClipBorder.bottom, width, height, mPaint);
+
+        mPaint.setColor(Color.WHITE);
+        mPaint.setStrokeWidth(1);
+        mPaint.setStyle(Paint.Style.STROKE);
+        canvas.drawRect(mClipBorder.left, mClipBorder.top, mClipBorder.right, mClipBorder.bottom, mPaint);
+
+        if (mTipText != null) {
+            final float textWidth = mPaint.measureText(mTipText);
+            final float startX = (width - textWidth) / 2;
+            final Paint.FontMetrics fm = mPaint.getFontMetrics();
+            final float startY = mClipBorder.bottom + mClipBorder.top / 2 - (fm.descent - fm.ascent) / 2;
+            mPaint.setStyle(Paint.Style.FILL);
+            canvas.drawText(mTipText, startX, startY, mPaint);
+        }
     }
 }

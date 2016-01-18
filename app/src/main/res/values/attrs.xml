@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--取景框-->
+<declare-styleable name="Viewfinder">
+    <attr name="pwHeight" format="integer"/>
+    <attr name="pwWidth" format="integer"/>
+    <attr name="pwTipText" format="string"/>
+    <attr name="pwTipTextSize" format="dimension"/>
+</declare-styleable>
+</resources>

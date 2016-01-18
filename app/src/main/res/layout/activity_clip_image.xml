@@ -10,15 +10,10 @@
         android:id="@+id/clip_image_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottom"/>
-
-    <com.githang.clipimage.Viewfinder
-        android:id="@+id/crop_border"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:layout_above="@+id/bottom"
-        app:pwHeight="2"
-        app:pwWidth="3"/>
+        app:civMaskColor="@color/viewfinder_mask"
+        app:civHeight="2"
+        app:civWidth="3"/>
 
     <RelativeLayout
         android:id="@+id/bottom"

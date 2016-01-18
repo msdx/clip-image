@@ -18,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.githang.clipimage.ClipImageView;
-import com.githang.clipimage.Viewfinder;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,7 +32,6 @@ import java.io.IOException;
 public class ClipImageActivity extends Activity implements View.OnClickListener {
 
     private ClipImageView mClipImageView;
-    private Viewfinder mCropBorder;
     private TextView mCancel;
     private TextView mClip;
 
@@ -55,7 +53,6 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_clip_image);
         mClipImageView = (ClipImageView) findViewById(R.id.clip_image_view);
-        mCropBorder = (Viewfinder) findViewById(R.id.crop_border);
         mCancel = (TextView) findViewById(R.id.cancel);
         mClip = (TextView) findViewById(R.id.clip);
 
@@ -77,8 +74,6 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
         mClipImageView.post(new Runnable() {
             @Override
             public void run() {
-                final Rect border = mCropBorder.getBorder();
-                mClipImageView.setClipBorder(border);
                 mClipImageView.setMaxOutputWidth(mMaxWidth);
 
                 mDegree = readPictureDegree(mInput);
@@ -96,7 +91,7 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
                 int w = isRotate ? options.outHeight : options.outWidth;
 
                 // 裁剪是宽高比例3:2，只考虑宽度情况，这里按border宽度的两倍来计算缩放。
-                mSampleSize = findBestSample(w, border.width());
+                mSampleSize = findBestSample(w, mClipImageView.getClipBorder().width());
 
                 options.inJustDecodeBounds = false;
                 options.inSampleSize = mSampleSize;
@@ -122,7 +117,7 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
 
     private static int findBestSample(int origin, int target) {
         int sample = 1;
-        for(int out = origin / 2; out > target; out /= 2) {
+        for (int out = origin / 2; out > target; out /= 2) {
             sample *= 2;
         }
         return sample;
@@ -217,7 +212,7 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
         final float transY = matrixValues[Matrix.MTRANS_Y];
 
         // 获取在显示的图片中裁剪的位置
-        final Rect border = mCropBorder.getBorder();
+        final Rect border = mClipImageView.getClipBorder();
         final float cropX = ((-transX + border.left) / scale) * mSampleSize;
         final float cropY = ((-transY + border.top) / scale) * mSampleSize;
         final float cropWidth = (border.width() / scale) * mSampleSize;

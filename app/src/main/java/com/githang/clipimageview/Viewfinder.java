@@ -1,4 +1,4 @@
-package com.githang.clipimage;
+package com.githang.clipimageview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
