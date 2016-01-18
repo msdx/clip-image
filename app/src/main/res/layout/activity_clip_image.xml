@@ -11,8 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom"
-        app:civMaskColor="@color/viewfinder_mask"
+        app:civClipPadding="@dimen/padding_common"
         app:civHeight="2"
+        app:civMaskColor="@color/viewfinder_mask"
         app:civWidth="3"/>
 
     <RelativeLayout

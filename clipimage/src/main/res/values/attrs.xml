@@ -7,5 +7,6 @@
     <attr name="civTipText" format="string"/>
     <attr name="civTipTextSize" format="dimension"/>
     <attr name="civMaskColor" format="color"/>
+    <attr name="civClipPadding" format="dimension"/>
 </declare-styleable>
 </resources>

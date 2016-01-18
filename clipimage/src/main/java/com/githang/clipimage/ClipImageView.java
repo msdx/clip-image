@@ -34,6 +34,7 @@ public class ClipImageView extends ImageView implements
     private final int mWidth;
     private final int mHeight;
     private final String mTipText;
+    private final int mClipPadding;
 
     private float mScaleMax = 4.0f;
     private float mScaleMin = 2.0f;
@@ -107,6 +108,7 @@ public class ClipImageView extends ImageView implements
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.ClipImageView);
         mWidth = ta.getInteger(R.styleable.ClipImageView_civWidth, 1);
         mHeight = ta.getInteger(R.styleable.ClipImageView_civHeight, 1);
+        mClipPadding = ta.getDimensionPixelSize(R.styleable.ClipImageView_civClipPadding, 0);
         mTipText = ta.getString(R.styleable.ClipImageView_civTipText);
         mMaskColor = ta.getColor(R.styleable.ClipImageView_civMaskColor, 0xB2000000);
         final int textSize = ta.getDimensionPixelSize(R.styleable.ClipImageView_civTipTextSize, 24);
@@ -312,8 +314,9 @@ public class ClipImageView extends ImageView implements
         super.onLayout(changed, left, top, right, bottom);
         final int width = getWidth();
         final int height = getHeight();
-        final int borderHeight = width * mHeight / mWidth;
-        mClipBorder.right = width;
+        mClipBorder.left = mClipPadding;
+        mClipBorder.right = width - mClipPadding;
+        final int borderHeight = mClipBorder.width() * mHeight / mWidth;
         mClipBorder.top = (height - borderHeight) / 2;
         mClipBorder.bottom = mClipBorder.top + borderHeight;
     }
@@ -484,6 +487,8 @@ public class ClipImageView extends ImageView implements
         mPaint.setStyle(Paint.Style.FILL);
         canvas.drawRect(0, 0, width, mClipBorder.top, mPaint);
         canvas.drawRect(0, mClipBorder.bottom, width, height, mPaint);
+        canvas.drawRect(0, mClipBorder.top, mClipBorder.left, mClipBorder.bottom, mPaint);
+        canvas.drawRect(mClipBorder.right, mClipBorder.top, width, mClipBorder.bottom, mPaint);
 
         mPaint.setColor(Color.WHITE);
         mPaint.setStrokeWidth(1);
