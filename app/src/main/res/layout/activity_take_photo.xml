@@ -4,6 +4,7 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@android:color/black"
                 android:orientation="vertical">
 
     <SurfaceView
@@ -37,7 +38,8 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:padding="@dimen/padding_common"
-            android:text="@android:string/cancel"/>
+            android:text="@android:string/cancel"
+            android:textColor="@android:color/white"/>
 
         <View
             android:id="@+id/take_photo"

@@ -3,7 +3,8 @@
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:background="@android:color/black">
 
     <com.githang.clipimage.ClipImageView
         android:id="@+id/clip_image_view"
@@ -35,7 +36,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_common"
-            android:text="@android:string/cancel"/>
+            android:text="@android:string/cancel"
+            android:textColor="@android:color/white"/>
 
         <TextView
             android:id="@+id/clip"
@@ -43,6 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:padding="@dimen/padding_common"
-            android:text="@android:string/cut"/>
+            android:text="@android:string/cut"
+            android:textColor="@android:color/white"/>
     </RelativeLayout>
 </RelativeLayout>

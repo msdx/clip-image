@@ -38,7 +38,7 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
     private TextView mClip;
 
     private String mOutput;
-    private String mInputPath;
+    private String mInput;
     private int mMaxWidth;
 
     // 图片被旋转的角度
@@ -64,7 +64,7 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
 
         final Intent data = getIntent();
         mOutput = PhotoActionHelper.getOutputPath(data);
-        mInputPath = PhotoActionHelper.getInputPath(data);
+        mInput = PhotoActionHelper.getInputPath(data);
         mMaxWidth = PhotoActionHelper.getMaxOutputWidth(data);
 
         setImageAndClipParams();
@@ -81,13 +81,13 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
                 mClipImageView.setClipBorder(border);
                 mClipImageView.setMaxOutputWidth(mMaxWidth);
 
-                mDegree = readPictureDegree(mInputPath);
+                mDegree = readPictureDegree(mInput);
 
                 final boolean isRotate = (mDegree == 90 || mDegree == 270);
 
                 final BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(mInputPath, options);
+                BitmapFactory.decodeFile(mInput, options);
 
                 mSourceWidth = options.outWidth;
                 mSourceHeight = options.outHeight;
@@ -95,17 +95,13 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
                 // 如果图片被旋转，则宽高度置换
                 int w = isRotate ? options.outHeight : options.outWidth;
 
-                mSampleSize = 1;
                 // 裁剪是宽高比例3:2，只考虑宽度情况，这里按border宽度的两倍来计算缩放。
-                // sampleSize的值为2的幂次方，如果设为其他值，会降为比它小的最近的2的幂次方。
-                for (int outW = w / 2, borderW = border.width(); outW > borderW; outW /= 2) {
-                    mSampleSize *= 2;
-                }
+                mSampleSize = findBestSample(w, border.width());
 
                 options.inJustDecodeBounds = false;
                 options.inSampleSize = mSampleSize;
                 options.inPreferredConfig = Bitmap.Config.RGB_565;
-                final Bitmap source = BitmapFactory.decodeFile(mInputPath, options);
+                final Bitmap source = BitmapFactory.decodeFile(mInput, options);
 
                 // 解决图片被旋转的问题
                 Bitmap target;
@@ -122,6 +118,14 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
                 mClipImageView.setImageBitmap(target);
             }
         });
+    }
+
+    private static int findBestSample(int origin, int target) {
+        int sample = 1;
+        for(int out = origin / 2; out > target; out /= 2) {
+            sample *= 2;
+        }
+        return sample;
     }
 
     /**
@@ -184,13 +188,7 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
                     } catch (Exception e) {
                         Toast.makeText(ClipImageActivity.this, R.string.msg_could_not_save_photo, Toast.LENGTH_SHORT).show();
                     } finally {
-                        if (fos != null) {
-                            try {
-                                fos.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
+                        IOUtils.close(fos);
                     }
                     return null;
                 }
@@ -235,17 +233,16 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
         outputMatrix.setRotate(mDegree);
         // 如果裁剪之后的图片宽高仍然太大,则进行缩小
         if (mMaxWidth > 0 && cropWidth > mMaxWidth) {
-            final int sampleSize = cropWidth > mMaxWidth ? ((int) cropWidth / mMaxWidth) : 1;
-            ops.inSampleSize = sampleSize;
+            ops.inSampleSize = findBestSample((int) cropWidth, mMaxWidth);
 
-            final float outputScale = mMaxWidth / (cropWidth / sampleSize);
+            final float outputScale = mMaxWidth / (cropWidth / ops.inSampleSize);
             outputMatrix.postScale(outputScale, outputScale);
         }
 
         // 裁剪
         BitmapRegionDecoder decoder = null;
         try {
-            decoder = BitmapRegionDecoder.newInstance(mInputPath, false);
+            decoder = BitmapRegionDecoder.newInstance(mInput, false);
             final Bitmap source = decoder.decodeRegion(clipRect, ops);
             recycleImageViewBitmap();
             return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), outputMatrix, false);

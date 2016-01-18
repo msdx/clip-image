@@ -277,13 +277,8 @@ public class TakePhotoActivity extends Activity implements SurfaceHolder.Callbac
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            IOUtils.close(fos);
+
         }
     }
 

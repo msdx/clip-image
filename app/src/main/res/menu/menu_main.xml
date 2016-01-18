@@ -2,8 +2,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.githang.clipimageview.MainActivity" >
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
+    <item android:id="@+id/action_take_photo"
+        android:title="@string/action_take_photo"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
+    <item android:id="@+id/action_clip_image"
+        android:title="@string/action_clip"
+        android:orderInCategory="100"
+        app:showAsAction="always" />
 </menu>

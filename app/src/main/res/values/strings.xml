@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">ClipImageView</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_take_photo">拍照</string>
+    <string name="action_clip">裁剪</string>
     <string name="msg_camera_invalid_permission_denied">无法打开相机，可能是权限被拒绝</string>
     <string name="msg_camera_invalid_initial_failed">相机初始化失败，无法打开相机</string>
     <string name="msg_camera_invalid_unknown_error">无法打开相机，未知错误</string>
     <string name="msg_could_not_save_photo">无法保存图片</string>
-    <string name="msg_clipping_image">正在裁剪图片0</string>
+    <string name="msg_clipping_image">正在裁剪图片</string>
 </resources>
