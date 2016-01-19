@@ -3,7 +3,6 @@ package com.githang.clipimage;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -324,25 +323,28 @@ public class ClipImageView extends ImageView implements
     @Override
     public void setImageDrawable(Drawable drawable) {
         super.setImageDrawable(drawable);
-        resetImageMatrix();
+        postResetImageMatrix();
     }
 
     @Override
     public void setImageResource(int resId) {
         super.setImageResource(resId);
-        resetImageMatrix();
+        postResetImageMatrix();
     }
 
     @Override
     public void setImageURI(Uri uri) {
-        if (uri != null) {
-            final String pathName = uri.toString();
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inPreferredConfig = Bitmap.Config.RGB_565;
-            Bitmap bitmap = BitmapFactory.decodeFile(pathName, options);
-            setImageBitmap(bitmap);
-        }
-        resetImageMatrix();
+        super.setImageURI(uri);
+        postResetImageMatrix();
+    }
+
+    private void postResetImageMatrix() {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                resetImageMatrix();
+            }
+        });
     }
 
     /**

@@ -25,13 +25,7 @@
 设置图片：
 
 ```java
-        // 目前请使用post方式来设置图片
-        mClipImageView.post(new Runnable() {
-            @Override
-            public void run() {
-                mClipImageView.setImageBitmap(target);
-            }
-        });
+    mClipImageView.setImageBitmap(target);
 ```
 
 裁剪图片：

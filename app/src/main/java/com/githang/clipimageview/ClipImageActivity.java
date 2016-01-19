@@ -10,6 +10,7 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.os.AsyncTaskCompat;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import com.githang.clipimage.ClipImageView;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -64,8 +66,8 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
         mInput = PhotoActionHelper.getInputPath(data);
         mMaxWidth = PhotoActionHelper.getMaxOutputWidth(data);
 
-        setImageAndClipParams();
-
+//        setImageAndClipParams();
+        mClipImageView.setImageURI(Uri.fromFile(new File(mInput)));
         mDialog = new ProgressDialog(this);
         mDialog.setMessage(getString(R.string.msg_clipping_image));
     }
