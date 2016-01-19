@@ -395,14 +395,13 @@ public class ClipImageView extends ImageView implements
      */
     public Bitmap clip() {
         final Drawable drawable = getDrawable();
+        final Bitmap originalBitmap = ((BitmapDrawable) drawable).getBitmap();
 
         final float[] matrixValues = new float[9];
         mScaleMatrix.getValues(matrixValues);
-        final float scale = matrixValues[Matrix.MSCALE_X];
+        final float scale = matrixValues[Matrix.MSCALE_X] * drawable.getIntrinsicWidth() / originalBitmap.getWidth();
         final float transX = matrixValues[Matrix.MTRANS_X];
         final float transY = matrixValues[Matrix.MTRANS_Y];
-
-        final Bitmap originalBitmap = ((BitmapDrawable) drawable).getBitmap();
 
         final float cropX = (-transX + mClipBorder.left) / scale;
         final float cropY = (-transY + mClipBorder.top) / scale;
