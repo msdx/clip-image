@@ -6,6 +6,12 @@
 
 ##使用方式
 
+**添加依赖**
+
+```gradle
+    compile 'com.githang:clipimageview:0.1'
+```
+
 **XML代码**
 
 ```xml
@@ -45,3 +51,10 @@
 - `civTipTextSize` 裁剪的提示文字的大小
 - `civMaskColor` 遮罩层颜色
 - `civClipPadding` 裁剪框边距
+
+##参考资料
+
+- [《Android 高仿微信头像截取 打造不一样的自定义控件》](http://blog.csdn.net/lmj623565791/article/details/39761281)
+- [《Android高仿微信头像裁剪》](http://blog.csdn.net/xiechengfa/article/details/45702427)
+- [cropper](https://github.com/edmodo/cropper)
+
