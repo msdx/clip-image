@@ -60,8 +60,6 @@ public class ClipImageView extends ImageView implements
     private GestureDetector mGestureDetector;
     private boolean isAutoScale;
 
-    private int mTouchSlop;
-
     private float mLastX;
     private float mLastY;
 
@@ -460,7 +458,7 @@ public class ClipImageView extends ImageView implements
      * @return
      */
     private boolean isCanDrag(float dx, float dy) {
-        return Math.sqrt((dx * dx) + (dy * dy)) >= mTouchSlop;
+        return Math.sqrt((dx * dx) + (dy * dy)) >= 0;
     }
 
     public Rect getClipBorder() {
