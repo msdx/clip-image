@@ -10,7 +10,6 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.ExifInterface;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.os.AsyncTaskCompat;
@@ -20,7 +19,6 @@ import android.widget.Toast;
 
 import com.githang.clipimage.ClipImageView;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -66,8 +64,8 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
         mInput = PhotoActionHelper.getInputPath(data);
         mMaxWidth = PhotoActionHelper.getMaxOutputWidth(data);
 
-//        setImageAndClipParams();
-        mClipImageView.setImageURI(Uri.fromFile(new File(mInput)));
+        setImageAndClipParams(); //大图裁剪
+//        mClipImageView.setImageURI(Uri.fromFile(new File(mInput)));
         mDialog = new ProgressDialog(this);
         mDialog.setMessage(getString(R.string.msg_clipping_image));
     }
@@ -117,6 +115,12 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
         });
     }
 
+    /**
+     * 计算最好的采样大小。
+     * @param origin 当前宽度
+     * @param target 限定宽度
+     * @return sampleSize
+     */
     private static int findBestSample(int origin, int target) {
         int sample = 1;
         for (int out = origin / 2; out > target; out /= 2) {
@@ -176,7 +180,7 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
                     FileOutputStream fos = null;
                     try {
                         fos = new FileOutputStream(mOutput);
-                        Bitmap bitmap = getClippedBitmap();
+                        Bitmap bitmap = createClippedBitmap();
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
                         if (!bitmap.isRecycled()) {
                             bitmap.recycle();
@@ -202,7 +206,7 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
         }
     }
 
-    private Bitmap getClippedBitmap() {
+    private Bitmap createClippedBitmap() {
         if (mSampleSize <= 1) {
             return mClipImageView.clip();
         }
