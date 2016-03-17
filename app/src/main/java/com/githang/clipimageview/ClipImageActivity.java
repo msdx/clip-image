@@ -117,6 +117,7 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
 
     /**
      * 计算最好的采样大小。
+     *
      * @param origin 当前宽度
      * @param target 限定宽度
      * @return sampleSize
@@ -257,17 +258,16 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
     }
 
     private Rect getRealRect(RectF srcRect) {
-        final int reverseDegree = 360 - mDegree;// 矩形应该旋转的角度与图片需要旋转的角度方向相反
-        switch (reverseDegree) {
+        switch (mDegree) {
             case 90:
-                return new Rect((int) (mSourceWidth - srcRect.bottom), (int) srcRect.left,
-                        (int) (mSourceWidth - srcRect.top), (int) srcRect.right);
+                return new Rect((int) srcRect.top, (int) (mSourceHeight - srcRect.right),
+                        (int) srcRect.bottom, (int) (mSourceHeight - srcRect.left));
             case 180:
                 return new Rect((int) (mSourceHeight - srcRect.right), (int) (mSourceWidth - srcRect.bottom),
                         (int) (mSourceHeight - srcRect.left), (int) (mSourceWidth - srcRect.top));
             case 270:
-                return new Rect((int) srcRect.top, (int) (mSourceHeight - srcRect.right),
-                        (int) srcRect.bottom, (int) (mSourceHeight - srcRect.left));
+                return new Rect((int) (mSourceWidth - srcRect.bottom), (int) srcRect.left,
+                        (int) (mSourceWidth - srcRect.top), (int) srcRect.right);
             default:
                 return new Rect((int) srcRect.left, (int) srcRect.top, (int) srcRect.right, (int) srcRect.bottom);
         }
