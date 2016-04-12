@@ -7,6 +7,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
@@ -69,6 +71,9 @@ public class ClipImageView extends ImageView implements
     private Rect mClipBorder = new Rect();
     private int mMaxOutputWidth = 0;
 
+    private boolean mDrawCircleFlag;
+    private float mRoundCorner;
+
     public ClipImageView(Context context) {
         this(context, null);
     }
@@ -108,6 +113,8 @@ public class ClipImageView extends ImageView implements
         mClipPadding = ta.getDimensionPixelSize(R.styleable.ClipImageView_civClipPadding, 0);
         mTipText = ta.getString(R.styleable.ClipImageView_civTipText);
         mMaskColor = ta.getColor(R.styleable.ClipImageView_civMaskColor, 0xB2000000);
+        mDrawCircleFlag = ta.getBoolean(R.styleable.ClipImageView_civClipCircle, false);
+        mRoundCorner = ta.getDimension(R.styleable.ClipImageView_civClipRoundCorner, 0);
         final int textSize = ta.getDimensionPixelSize(R.styleable.ClipImageView_civTipTextSize, 24);
         mPaint.setTextSize(textSize);
         ta.recycle();
@@ -314,8 +321,14 @@ public class ClipImageView extends ImageView implements
         mClipBorder.left = mClipPadding;
         mClipBorder.right = width - mClipPadding;
         final int borderHeight = mClipBorder.width() * mHeight / mWidth;
-        mClipBorder.top = (height - borderHeight) / 2;
-        mClipBorder.bottom = mClipBorder.top + borderHeight;
+        if (mDrawCircleFlag == true) { // 如果是圆形,宽高比例是1:1
+            final int borderTempHeight = mClipBorder.width() * 1 / 1;
+            mClipBorder.top = (height - borderTempHeight) / 2;
+            mClipBorder.bottom = mClipBorder.top + borderTempHeight;
+        } else { // 如果不是圆形,根据宽高比例
+            mClipBorder.top = (height - borderHeight) / 2;
+            mClipBorder.bottom = mClipBorder.top + borderHeight;
+        }
     }
 
     @Override
@@ -336,13 +349,20 @@ public class ClipImageView extends ImageView implements
         postResetImageMatrix();
     }
 
+    /**
+     * 这里没有使用post方式,因为图片会有明显的从初始位置移动到需要缩放的位置
+     */
     private void postResetImageMatrix() {
-        post(new Runnable() {
-            @Override
-            public void run() {
-                resetImageMatrix();
-            }
-        });
+        if (getWidth() != 0) {
+            resetImageMatrix();
+        } else {
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    resetImageMatrix();
+                }
+            });
+        }
     }
 
     /**
@@ -476,6 +496,29 @@ public class ClipImageView extends ImageView implements
     }
 
 
+    /**
+     * 参考showtipsview的做法
+     */
+    public void drawRectangleOrCircle(Canvas canvas) {
+        Bitmap bitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas temp = new Canvas(bitmap);
+        Paint transparentPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        PorterDuffXfermode porterDuffXfermode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
+        transparentPaint.setColor(Color.TRANSPARENT);
+        temp.drawRect(0, 0, temp.getWidth(), temp.getHeight(), mPaint);
+        transparentPaint.setXfermode(porterDuffXfermode);
+        if (mDrawCircleFlag) { // 画圆
+            float cx = mClipBorder.left + mClipBorder.width() / 2f;
+            float cy = mClipBorder.top + mClipBorder.height() / 2f;
+            float radius = mClipBorder.height() / 2f;
+            temp.drawCircle(cx, cy, radius, transparentPaint);
+        } else { // 画矩形(可以设置矩形的圆角)
+            RectF rectF = new RectF(mClipBorder.left, mClipBorder.top, mClipBorder.right, mClipBorder.bottom);
+            temp.drawRoundRect(rectF, mRoundCorner, mRoundCorner, transparentPaint);
+        }
+        canvas.drawBitmap(bitmap, 0, 0, null);
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -484,15 +527,17 @@ public class ClipImageView extends ImageView implements
 
         mPaint.setColor(mMaskColor);
         mPaint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(0, 0, width, mClipBorder.top, mPaint);
-        canvas.drawRect(0, mClipBorder.bottom, width, height, mPaint);
-        canvas.drawRect(0, mClipBorder.top, mClipBorder.left, mClipBorder.bottom, mPaint);
-        canvas.drawRect(mClipBorder.right, mClipBorder.top, width, mClipBorder.bottom, mPaint);
+//        canvas.drawRect(0, 0, width, mClipBorder.top, mPaint);
+//        canvas.drawRect(0, mClipBorder.bottom, width, height, mPaint);
+//        canvas.drawRect(0, mClipBorder.top, mClipBorder.left, mClipBorder.bottom, mPaint);
+//        canvas.drawRect(mClipBorder.right, mClipBorder.top, width, mClipBorder.bottom, mPaint);
 
-        mPaint.setColor(Color.WHITE);
+//        mPaint.setColor(Color.WHITE);
         mPaint.setStrokeWidth(1);
-        mPaint.setStyle(Paint.Style.STROKE);
-        canvas.drawRect(mClipBorder.left, mClipBorder.top, mClipBorder.right, mClipBorder.bottom, mPaint);
+        drawRectangleOrCircle(canvas);
+//        mPaint.setStyle(Paint.Style.STROKE);
+//
+//        canvas.drawRect(mClipBorder.left, mClipBorder.top, mClipBorder.right, mClipBorder.bottom, mPaint);
 
         if (mTipText != null) {
             final float textWidth = mPaint.measureText(mTipText);
