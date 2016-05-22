@@ -257,8 +257,8 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
                 return new Rect((int) srcRect.top, (int) (mSourceHeight - srcRect.right),
                         (int) srcRect.bottom, (int) (mSourceHeight - srcRect.left));
             case 180:
-                return new Rect((int) (mSourceHeight - srcRect.right), (int) (mSourceWidth - srcRect.bottom),
-                        (int) (mSourceHeight - srcRect.left), (int) (mSourceWidth - srcRect.top));
+                return new Rect((int) (mSourceWidth - srcRect.right), (int) (mSourceHeight - srcRect.bottom),
+                        (int) (mSourceWidth - srcRect.left), (int) (mSourceHeight - srcRect.top));
             case 270:
                 return new Rect((int) (mSourceWidth - srcRect.bottom), (int) srcRect.left,
                         (int) (mSourceWidth - srcRect.top), (int) srcRect.right);
