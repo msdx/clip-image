@@ -29,12 +29,12 @@ import android.widget.ImageView;
  */
 public class ClipImageView extends ImageView implements
         ScaleGestureDetector.OnScaleGestureListener, View.OnTouchListener {
-    private final int mMaskColor;
-
     private final Paint mPaint;
-    private final int mWidth;
-    private final int mHeight;
-    private final String mTipText;
+
+    private final int mMaskColor;
+    private int mAspectX;
+    private int mAspectY;
+    private String mTipText;
     private final int mClipPadding;
 
     private float mScaleMax = 4.0f;
@@ -108,8 +108,8 @@ public class ClipImageView extends ImageView implements
         mPaint.setColor(Color.WHITE);
 
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.ClipImageView);
-        mWidth = ta.getInteger(R.styleable.ClipImageView_civWidth, 1);
-        mHeight = ta.getInteger(R.styleable.ClipImageView_civHeight, 1);
+        mAspectX = ta.getInteger(R.styleable.ClipImageView_civWidth, 1);
+        mAspectY = ta.getInteger(R.styleable.ClipImageView_civHeight, 1);
         mClipPadding = ta.getDimensionPixelSize(R.styleable.ClipImageView_civClipPadding, 0);
         mTipText = ta.getString(R.styleable.ClipImageView_civTipText);
         mMaskColor = ta.getColor(R.styleable.ClipImageView_civMaskColor, 0xB2000000);
@@ -316,11 +316,15 @@ public class ClipImageView extends ImageView implements
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
+        updateBorder();
+    }
+
+    private void updateBorder() {
         final int width = getWidth();
         final int height = getHeight();
         mClipBorder.left = mClipPadding;
         mClipBorder.right = width - mClipPadding;
-        final int borderHeight = mClipBorder.width() * mHeight / mWidth;
+        final int borderHeight = mClipBorder.width() * mAspectY / mAspectX;
         if (mDrawCircleFlag == true) { // 如果是圆形,宽高比例是1:1
             final int borderTempHeight = mClipBorder.width() * 1 / 1;
             mClipBorder.top = (height - borderTempHeight) / 2;
@@ -329,6 +333,15 @@ public class ClipImageView extends ImageView implements
             mClipBorder.top = (height - borderHeight) / 2;
             mClipBorder.bottom = mClipBorder.top + borderHeight;
         }
+    }
+
+    public void setAspect(int aspectX, int aspectY) {
+        mAspectX = aspectX;
+        mAspectY = aspectY;
+    }
+
+    public void setTip(String tip) {
+        mTipText = tip;
     }
 
     @Override

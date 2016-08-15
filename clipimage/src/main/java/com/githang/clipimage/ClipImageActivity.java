@@ -12,6 +12,7 @@ import android.graphics.RectF;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,10 +57,13 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
         mCancel.setOnClickListener(this);
         mClip.setOnClickListener(this);
 
-        final Intent data = getIntent();
-        mOutput = PhotoActionHelper.getOutputPath(data);
-        mInput = PhotoActionHelper.getInputPath(data);
-        mMaxWidth = PhotoActionHelper.getMaxOutputWidth(data);
+        ClipOptions clipOptions = ClipOptions.createFromBundle(getIntent());
+        mOutput = clipOptions.getOutputPath();
+        mInput = clipOptions.getInputPath();
+        mMaxWidth = clipOptions.getMaxWidth();
+        mClipImageView.setAspect(clipOptions.getAspectX(), clipOptions.getAspectY());
+        mClipImageView.setTip(clipOptions.getTip());
+        mClipImageView.setMaxOutputWidth(mMaxWidth);
 
         setImageAndClipParams(); //大图裁剪
 //        mClipImageView.setImageURI(Uri.fromFile(new File(mInput)));
@@ -280,5 +284,105 @@ public class ClipImageActivity extends Activity implements View.OnClickListener 
     public void onBackPressed() {
         setResult(Activity.RESULT_CANCELED, getIntent());
         super.onBackPressed();
+    }
+
+    public static ClipOptions prepare() {
+        return new ClipOptions();
+    }
+
+    public static class ClipOptions {
+        private int aspectX;
+        private int aspectY;
+        private int maxWidth;
+        private String tip;
+        private String inputPath;
+        private String outputPath;
+
+        private ClipOptions() {}
+
+        public ClipOptions aspectX(int aspectX) {
+            this.aspectX = aspectX;
+            return this;
+        }
+
+        public ClipOptions aspectY(int aspectY) {
+            this.aspectY = aspectY;
+            return this;
+        }
+
+        public ClipOptions maxWidth(int maxWidth) {
+            this.maxWidth = maxWidth;
+            return this;
+        }
+
+        public ClipOptions tip(String tip) {
+            this.tip = tip;
+            return this;
+        }
+
+        public ClipOptions inputPath(String path) {
+            this.inputPath = path;
+            return this;
+        }
+
+        public ClipOptions outputPath(String path) {
+            this.outputPath = path;
+            return this;
+        }
+
+        public int getAspectX() {
+            return aspectX;
+        }
+
+        public int getAspectY() {
+            return aspectY;
+        }
+
+        public int getMaxWidth() {
+            return maxWidth;
+        }
+
+        public String getTip() {
+            return tip;
+        }
+
+        public String getInputPath() {
+            return inputPath;
+        }
+
+        public String getOutputPath() {
+            return outputPath;
+        }
+
+        public void startForResult(Activity activity, int requestCode) {
+            checkValues();
+            Intent intent = new Intent(activity, ClipImageActivity.class);
+            intent.putExtra("aspectX", aspectX);
+            intent.putExtra("aspectY", aspectY);
+            intent.putExtra("maxWidth", maxWidth);
+            intent.putExtra("tip", tip);
+            intent.putExtra("inputPath", inputPath);
+            intent.putExtra("outputPath", outputPath);
+            activity.startActivityForResult(intent, requestCode);
+        }
+
+        private void checkValues() {
+            if (TextUtils.isEmpty(inputPath)) {
+                throw new IllegalArgumentException("The input path could not be empty");
+            }
+            if (TextUtils.isEmpty(outputPath)) {
+                throw new IllegalArgumentException("The output path could not be empty");
+            }
+        }
+
+        public static ClipOptions createFromBundle(Intent intent) {
+            return new ClipOptions()
+                    .aspectX(intent.getIntExtra("aspectX", 1))
+                    .aspectY(intent.getIntExtra("aspectY", 1))
+                    .maxWidth(intent.getIntExtra("maxWidth", 0))
+                    .tip(intent.getStringExtra("tip"))
+                    .inputPath(intent.getStringExtra("inputPath"))
+                    .outputPath(intent.getStringExtra("outputPath"));
+        }
     }
 }

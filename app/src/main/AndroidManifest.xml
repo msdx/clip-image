@@ -21,7 +21,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ClipImageActivity" android:theme="@style/AppTheme.NoActionBar" android:screenOrientation="portrait"/>
         <activity android:name=".TakePhotoActivity" android:theme="@style/AppTheme.NoActionBar" android:screenOrientation="portrait"/>
     </application>
 

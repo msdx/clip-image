@@ -21,27 +21,13 @@ public class PhotoActionHelper {
         return new PhotoActionHelper(from, TakePhotoActivity.class);
     }
 
-    public static PhotoActionHelper clipImage(Activity from) {
-        return new PhotoActionHelper(from, ClipImageActivity.class);
-    }
-
     public PhotoActionHelper output(String path) {
         mIntent.putExtra(EXTRA_OUTPUT, path);
         return this;
     }
 
-    public PhotoActionHelper input(String path) {
-        mIntent.putExtra(EXTRA_INPUT, path);
-        return this;
-    }
-
     public PhotoActionHelper maxOutputWidth(int width) {
         mIntent.putExtra(EXTRA_OUTPUT_MAX_WIDTH, width);
-        return this;
-    }
-
-    public PhotoActionHelper extra(Intent intent) {
-        mIntent.putExtras(intent);
         return this;
     }
 

@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.githang.clipimage.ClipImageActivity;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -270,10 +272,10 @@ public class TakePhotoActivity extends Activity implements SurfaceHolder.Callbac
             fos = new FileOutputStream(tempPath);
             fos.write(data);
             fos.flush();
-            PhotoActionHelper.clipImage(this)
-                    .extra(getIntent())
-                    .output(mOutput).input(tempPath)
-                    .requestCode(Const.REQUEST_CLIP_IMAGE).start();
+            ClipImageActivity.prepare()
+                    .aspectX(3).aspectY(2)
+                    .inputPath(tempPath).outputPath(mOutput)
+                    .startForResult(this, Const.REQUEST_CLIP_IMAGE);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

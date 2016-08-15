@@ -1,3 +1,8 @@
-<manifest package="com.githang.clipimage">
-    <application/>
+<manifest package="com.githang.clipimage"
+          xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity android:name=".ClipImageActivity"
+                  android:screenOrientation="portrait"
+                  android:theme="@android:style/Theme.Black.NoTitleBar"/>
+    </application>
 </manifest>

@@ -14,6 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.githang.clipimage.ClipImageActivity;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -91,8 +93,10 @@ public class MainActivity extends AppCompatActivity {
                     .requestCode(Const.REQUEST_TAKE_PHOTO).start();
             return true;
         } else if (id == R.id.action_clip_image) {
-            PhotoActionHelper.clipImage(this).input(mDemoPath).output(mOutputPath)
-                    .requestCode(Const.REQUEST_CLIP_IMAGE).start();
+            ClipImageActivity.prepare()
+                    .aspectX(3).aspectY(2)
+                    .inputPath(mDemoPath).outputPath(mOutputPath)
+                    .startForResult(this, Const.REQUEST_CLIP_IMAGE);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -103,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK
                 && data != null
                 && (requestCode == Const.REQUEST_CLIP_IMAGE || requestCode == Const.REQUEST_TAKE_PHOTO)) {
-            String path = PhotoActionHelper.getOutputPath(data);
+            String path = ClipImageActivity.ClipOptions.createFromBundle(data).getOutputPath();
             if (path != null) {
                 Bitmap bitmap = BitmapFactory.decodeFile(path);
                 mImageView.setImageBitmap(bitmap);
