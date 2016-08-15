@@ -43,8 +43,31 @@
     return mClipImageView.clip();
 ```
 
+###直接调用里面的Activity
+启动裁剪界面
+```java
+ ClipImageActivity.prepare()
+                    .aspectX(3).aspectY(2)//裁剪框横向及纵向上的比例
+                    .inputPath(tempPath).outputPath(mOutput)//要裁剪的图片地址及裁剪后保存的地址
+                    .startForResult(this, Const.REQUEST_CLIP_IMAGE);
+```
+接收裁剪结果
+```java
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == Const.REQUEST_CLIP_IMAGE) {
+            String path = ClipImageActivity.ClipOptions.createFromBundle(data).getOutputPath();
+            if (path != null) {
+                Bitmap bitmap = BitmapFactory.decodeFile(path);
+                mImageView.setImageBitmap(bitmap);
+            }
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+```
 ##大图裁剪
-请参考app模块里的ClipImageActivity。
+请参考ClipImageActivity类。
 
 ##目前支持属性
 
